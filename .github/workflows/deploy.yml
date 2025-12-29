@@ -9,15 +9,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-
-    - name: Deploy to EC2
+    - name: Deploy on EC2 using SSH
       uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ${{ secrets.EC2_USER }}
         key: ${{ secrets.EC2_KEY }}
         script: |
+          cd ~
+          if [ ! -d node-ec2-cicd ]; then
+            git clone https://github.com/Harshavardhangutti1994/node-ec2-cicd.git
+          fi
+          cd node-ec2-cicd
+          git pull origin main
           docker stop node-app || true
           docker rm node-app || true
           docker build -t node-app .
